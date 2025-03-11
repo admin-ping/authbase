@@ -1,0 +1,21 @@
+2025-03-06 17:44:39,495 - WARNING -  * Debugger is active!
+2025-03-06 17:44:39,499 - INFO -  * Debugger PIN: 417-243-363
+2025-03-06 17:44:57,521 - INFO - ”√ªß admin ÃÌº”«√√≈πÊ‘Ú£∫{'port_sequence': '2761:TCP,11041:UDP,5627:TCP', 'target_port': 22, 'time_window': 10, 'timeout': 300, 'password': '68bb336f08581e79277516f5b936495b'}
+2025-03-06 17:44:57,533 - ERROR - ∆Ù∂Ø ß∞‹: [WinError 2] œµÕ≥’“≤ªµΩ÷∏∂®µƒŒƒº˛°£
+2025-03-06 17:44:57,534 - INFO - 127.0.0.1 - - [06/Mar/2025 17:44:57] "[35m[1mPOST /addrules HTTP/1.1[0m" 500 -
+2025-03-06 17:45:06,363 - INFO - ”√ªß admin ÃÌº”«√√≈πÊ‘Ú£∫{'port_sequence': '2761:TCP,11041:UDP,5627:TCP', 'target_port': 22, 'time_window': 10, 'timeout': 300, 'password': '68bb336f08581e79277516f5b936495b'}
+2025-03-06 17:45:06,373 - ERROR - ∆Ù∂Ø ß∞‹: [WinError 2] œµÕ≥’“≤ªµΩ÷∏∂®µƒŒƒº˛°£
+2025-03-06 17:45:06,374 - INFO - 127.0.0.1 - - [06/Mar/2025 17:45:06] "[35m[1mPOST /addrules HTTP/1.1[0m" 500 -
+2025-03-06 17:45:08,263 - INFO - ”√ªß admin ÃÌº”«√√≈πÊ‘Ú£∫{'port_sequence': '2761:TCP,11041:UDP,5627:TCP', 'target_port': 22, 'time_window': 10, 'timeout': 300, 'password': '68bb336f08581e79277516f5b936495b'}
+2025-03-06 17:45:08,274 - ERROR - ∆Ù∂Ø ß∞‹: [WinError 2] œµÕ≥’“≤ªµΩ÷∏∂®µƒŒƒº˛°£
+2025-03-06 17:45:08,275 - INFO - 127.0.0.1 - - [06/Mar/2025 17:45:08] "[35m[1mPOST /addrules HTTP/1.1[0m" 500 -
+2025-03-06 17:45:10,854 - INFO - ”√ªß admin ÃÌº”«√√≈πÊ‘Ú£∫{'port_sequence': '2761:TCP,11041:UDP,5627:TCP', 'target_port': 22, 'time_window': 10, 'timeout': 300, 'password': '68bb336f08581e79277516f5b936495b'}
+2025-03-06 17:45:10,865 - ERROR - ∆Ù∂Ø ß∞‹: [WinError 2] œµÕ≥’“≤ªµΩ÷∏∂®µƒŒƒº˛°£
+2025-03-06 17:45:10,865 - INFO - 127.0.0.1 - - [06/Mar/2025 17:45:10] "[35m[1mPOST /addrules HTTP/1.1[0m" 500 -
+2025-03-06 17:45:20,893 - INFO -  * Detected change in 'D:\\py\\authbase-master\\app\\routes\\knocking.py', reloading
+2025-03-06 17:45:21,683 - WARNING -  * Debugger is active!
+2025-03-06 17:45:21,688 - INFO -  * Debugger PIN: 417-243-363
+2025-03-06 17:45:21,778 - INFO -  * Detected change in 'D:\\py\\authbase-master\\app\\routes\\knocking.py', reloading
+2025-03-06 17:45:22,607 - WARNING -  * Debugger is active!
+2025-03-06 17:45:22,611 - INFO -  * Debugger PIN: 417-243-363
+2025-03-06 17:45:23,752 - INFO -  * Detected change in 'D:\\py\\authbase-master\\app\\routes\\knocking.py', reloading
