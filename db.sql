@@ -125,11 +125,11 @@ INSERT INTO `SYRESOURCE` (`ID`, `CREATEDATETIME`, `DESCRIPTION`, `ICONCLS`, `NAM
 	('zylb', '2015-08-25 10:34:53', '查询资源', 'ext-icon-bullet_wrench', '资源列表', 0, '', '2015-08-25 10:34:53', NULL, '/base/syresource!treeGrid', 'system:menu:query', 'zygl', '1', '0'),
 	('zysc', '2015-08-25 10:34:53', '删除资源', 'ext-icon-bullet_wrench', '删除资源', 3, '', '2015-08-25 10:34:53', NULL, '/base/syresource!delete', 'system:menu:remove', 'zygl', '1', '0'),
 	('zytj', '2015-08-25 10:34:53', '添加资源', 'ext-icon-bullet_wrench', '添加资源', 1, '', '2015-08-25 10:34:53', NULL, '/base/syresource!save', 'system:menu:add', 'zygl', '1', '0'),
-	('knocking', '2023-09-20 10:34:53', '管理端口敲门规则', 'knock', '敲门管理', 4, '', '2023-09-20 10:34:53', 'index', 'monitor/knocking/index', 'system:knocking:list', 'xtgl', '0', '0'),
-	('knocking_add', '2023-09-20 10:34:53', '添加敲门规则', 'ext-icon-bullet_wrench', '添加规则', 1, '', '2023-09-20 10:34:53', NULL, NULL, 'monitor:knocking:add', 'knocking', '1', '0'),
-	('knocking_edit', '2023-09-20 10:34:53', '修改敲门规则', 'ext-icon-bullet_wrench', '修改规则', 2, '', '2023-09-20 10:34:53', NULL, NULL, 'monitor:knocking:edit', 'knocking', '1', '0'),
-	('knocking_delete', '2023-09-20 10:34:53', '删除敲门规则', 'ext-icon-bullet_wrench', '删除规则', 3, '', '2023-09-20 10:34:53', NULL, NULL, 'monitor:knocking:delete', 'knocking', '1', '0'),
-	('knocking_query', '2023-09-20 10:34:53', '查询敲门规则', 'ext-icon-bullet_wrench', '查询规则', 4, '', '2023-09-20 10:34:53', NULL, NULL, 'monitor:knocking:query', 'knocking', '1', '0'),
+	('knocking', '2023-09-20 10:34:53', '管理端口敲门规则', 'list', '敲门管理', 4, '', '2024-09-20 10:34:53', 'index', 'monitor/knocking/index', 'monitor:knocking:list', 'xtgl', '0', '0'),
+	('knocking_add', '2023-09-20 10:34:53', '添加敲门规则', 'ext-icon-bullet_wrench', '添加规则', 1, '', '2024-09-20 10:34:53', NULL, NULL, 'monitor:knocking:add', 'knocking', '1', '0'),
+	('knocking_edit', '2023-09-20 10:34:53', '修改敲门规则', 'ext-icon-bullet_wrench', '修改规则', 2, '', '2024-09-20 10:34:53', NULL, NULL, 'monitor:knocking:edit', 'knocking', '1', '0'),
+	('knocking_delete', '2023-09-20 10:34:53', '删除敲门规则', 'ext-icon-bullet_wrench', '删除规则', 3, '', '2024-09-20 10:34:53', NULL, NULL, 'monitor:knocking:delete', 'knocking', '1', '0'),
+	('knocking_query', '2023-09-20 10:34:53', '查询敲门规则', 'ext-icon-bullet_wrench', '查询规则', 4, '', '2024-09-20 10:34:53', NULL, NULL, 'monitor:knocking:query', 'knocking', '1', '0'),
 	('27fda67f-61d1-4fe6-8eea-d796a848ab67', '2022-05-28 12:54:39', NULL, 'edit', '参数设置', 6, '', '2022-05-28 12:54:39', 'config', 'system/config/index', 'system:config:list', 'xtgl', '3', '0'),
 	('37ac3cd3-560b-49b3-ae86-96d1963e9db6', '2022-05-28 12:55:59', NULL, NULL, '参数修改', 3, NULL, '2022-05-28 12:55:59', NULL, NULL, 'system:config:edit', '27fda67f-61d1-4fe6-8eea-d796a848ab67', '1', '0'),
 	('4621e9f8-e7c6-4c2b-8172-3d8c8ea75371', '2022-05-28 12:55:24', NULL, NULL, '参数新增', 2, NULL, '2022-05-28 12:55:24', NULL, NULL, 'system:config:add', '27fda67f-61d1-4fe6-8eea-d796a848ab67', '1', '0'),
@@ -226,6 +226,8 @@ INSERT INTO `SYROLE_SYRESOURCE` (`SYROLE_ID`, `SYRESOURCE_ID`) VALUES
 	('19f00d46-8f1b-45b5-b7b7-6197d7b8cb33', 'knocking_add'),
 	('0', 'knocking_delete'),
 	('19f00d46-8f1b-45b5-b7b7-6197d7b8cb33', 'knocking_delete'),
+	('0', 'knocking_edit'),
+	('19f00d46-8f1b-45b5-b7b7-6197d7b8cb33', 'knocking_edit'),
 	('0', 'jgbj'),
 	('0', 'jgck'),
 	('0', 'jggl'),
@@ -453,4 +455,4 @@ CREATE TABLE IF NOT EXISTS `sys_knocking_rule` (
 
 -- 导出  表 authbase.sys_knocking_rule 的数据：~1 rows (大约)
 INSERT INTO `sys_knocking_rule` (`id`, `port_sequence`, `target_port`, `time_window`, `timeout`, `password_hash`, `status`, `create_by`, `create_time`, `remark`) VALUES
-	('ffa5ed8428b48adaa5bc040604fb9204', '2761:TCP,11041:UDP,5627:TCP', 22, 10, 300, 'pbkdf2:sha256:260000$68bb336f08581e79277516f5b936495b', '1', 'admin', NOW(), '默认敲门规则');
+	('ffa5ed8428b48adaa5bc040604fb9204', '2761:TCP,11041:UDP,5627:TCP', 22, 10, 300, '68bb336f08581e79277516f5b936495b', '1', 'admin', NOW(), '示例规则，并不生效');

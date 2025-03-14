@@ -25,8 +25,9 @@ class KnockingRule(db.Model):
     def to_json(self):
         """将规则对象转换为JSON格式
         
-        Returns:
-            dict: 包含规则所有字段的JSON格式数据，字段名采用驼峰命名法
+        Returns：
+        - 时间字段格式：YYYY-MM-DD HH:MM:SS
+        - 状态字段值：0表示停用，1表示正常
         """
         json_data = {
             'id': self.id,

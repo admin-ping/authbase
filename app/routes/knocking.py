@@ -25,6 +25,7 @@ import os
 import psutil
 import logging
 import hashlib
+import signal
 from ..models.KnockingRule import KnockingRule
 from .. import permission
 
@@ -101,8 +102,17 @@ def add_knocking_rule():
     """
     data = request.get_json()
 
+    # 参数映射
+    mapped_data = {
+        'port_sequence': data.get('portSequence'),
+        'target_port': data.get('targetPort'),
+        'time_window': data.get('timeWindow'),
+        'timeout': data.get('timeout'),
+        'password': hashlib.md5(data.get('password', '').encode('utf-8')).hexdigest()
+    }
+
     # 参数验证
-    required_fields = ['port_sequence', 'target_port', 'time_window', 'timeout', 'password']
+    required_fields = ['portSequence', 'targetPort', 'timeWindow', 'timeout', 'password']
     if not all(field in data for field in required_fields):
         return jsonify({"error": "Missing required fields"}), 400
 
@@ -111,17 +121,17 @@ def add_knocking_rule():
         # hashed_pwd = generate_password_hash(data['password'])
 
         # 生成规则ID（基于端口序列和目标端口）
-        rule_str = f"{data['port_sequence'].replace(':', '_').replace(',', '-')}_{data['target_port']}"
+        rule_str = f"{mapped_data['port_sequence'].replace(':', '_').replace(',', '-')}_{mapped_data['target_port']}"
         rule_id = hashlib.md5(rule_str.encode('utf-8')).hexdigest()
 
         # 创建数据库记录
         rule = KnockingRule(
             id=rule_id,
-            port_sequence=data['port_sequence'],
-            target_port=data['target_port'],
-            time_window=data['time_window'],
-            timeout=data['timeout'],
-            password_hash=data['password'],
+            port_sequence=mapped_data['port_sequence'],
+            target_port=mapped_data['target_port'],
+            time_window=mapped_data['time_window'],
+            timeout=mapped_data['timeout'],
+            password_hash=mapped_data['password'],
             create_by=current_user.LOGINNAME,
             remark=data.get('remark')
         )
@@ -135,11 +145,11 @@ def add_knocking_rule():
             'sudo',  # 需要root权限
             'python3',
             os.path.join(os.path.dirname(os.path.dirname(__file__)), 'models', 'knocking_cmd.py'),
-            '-pl', data['port_sequence'],
-            '-p', str(data['target_port']),
-            '-w', str(data['time_window']),
-            '-t', str(data['timeout']),
-            '-passwd', data['password']
+            '-pl', mapped_data['port_sequence'],
+            '-p', str(mapped_data['target_port']),
+            '-w', str(mapped_data['time_window']),
+            '-t', str(mapped_data['timeout']),
+            '-passwd', mapped_data['password']
         ]
 
         pid_file = os.path.join(PID_FILE_DIR, f"{rule_id}.pid")
@@ -212,10 +222,15 @@ def stop_knocking_service(pid_file=None):
             pid = int(f.read().strip())
 
         try:
-            process = psutil.Process(pid)
-            process.terminate()
+            if os.name != 'nt':
+                # Linux系统下使用kill命令发送SIGTERM信号
+                os.kill(pid, signal.SIGTERM)
+                logging.info(f"已发送SIGTERM信号到进程 {pid}")
+            else:
+                process = psutil.Process(pid)
+                process.terminate()
             logging.info(f"已停止进程 {pid}")
-        except psutil.NoSuchProcess:
+        except (psutil.NoSuchProcess, ProcessLookupError):
             logging.warning(f"进程 {pid} 不存在")
             pass
 
@@ -230,10 +245,15 @@ def stop_knocking_service(pid_file=None):
                         pid = int(f.read().strip())
                     
                     try:
-                        process = psutil.Process(pid)
-                        process.terminate()
+                        if os.name != 'nt':
+                            # Linux系统下使用kill命令发送SIGTERM信号
+                            os.kill(pid, signal.SIGTERM)
+                            logging.info(f"已发送SIGTERM信号到进程 {pid}")
+                        else:
+                            process = psutil.Process(pid)
+                            process.terminate()
                         logging.info(f"已停止进程 {pid}")
-                    except psutil.NoSuchProcess:
+                    except (psutil.NoSuchProcess, ProcessLookupError):
                         pass
                     
                     os.remove(pid_path)
@@ -383,12 +403,12 @@ def update_knocking_rule(rule_id):
         'target_port': data.get('targetPort'),
         'time_window': data.get('timeWindow'),
         'timeout': data.get('timeout'),
-        'password': data.get('password')
+        'password': hashlib.md5(data.get('password', '').encode('utf-8')).hexdigest()
     }
     
     # 参数验证
-    required_fields = ['port_sequence', 'target_port', 'time_window', 'timeout', 'password']
-    if not all(mapped_data.get(field) for field in required_fields):
+    required_fields = ['portSequence', 'targetPort', 'timeWindow', 'timeout', 'password']
+    if not all(field in data for field in required_fields):
         return jsonify({
             'code': 400,
             'msg': '缺少必要的参数'

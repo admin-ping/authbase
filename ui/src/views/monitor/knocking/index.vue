@@ -187,10 +187,38 @@ export default {
     getList() {
       this.loading = true;
       listRules(this.addDateRange(this.queryParams, this.dateRange)).then(response => {
-        this.ruleList = response.data;
+        let filteredList = response.data;
+        
+        // 根据查询参数进行筛选
+        if (this.queryParams.id) {
+          filteredList = filteredList.filter(item => 
+            item.id.toString().toLowerCase().includes(this.queryParams.id.toLowerCase())
+          );
+        }
+        if (this.queryParams.portSequence) {
+          filteredList = filteredList.filter(item => 
+            item.portSequence.toLowerCase().includes(this.queryParams.portSequence.toLowerCase())
+          );
+        }
+        if (this.queryParams.createBy) {
+          filteredList = filteredList.filter(item => 
+            (item.createBy || '').toLowerCase().includes(this.queryParams.createBy.toLowerCase())
+          );
+        }
+        if (this.dateRange && this.dateRange.length === 2) {
+          const startDate = new Date(this.dateRange[0]);
+          const endDate = new Date(this.dateRange[1]);
+          filteredList = filteredList.filter(item => {
+            const itemDate = new Date(item.createTime);
+            return itemDate >= startDate && itemDate <= endDate;
+          });
+        }
+        
+        this.ruleList = filteredList;
         this.total = this.ruleList.length;
         this.loading = false;
       });
+    
     },
     /** 取消按钮 */
     cancel() {

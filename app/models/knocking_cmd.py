@@ -135,6 +135,15 @@ class KnockStateMachine:
         self.expected_password = args.password.encode('utf-8')
 
     def process_packet(self, pkt):
+        """
+        数据包处理核心逻辑
+        处理流程：
+        1. 解析IP协议层基本信息
+        2. 分离TCP/UDP协议头和载荷数据
+        3. 验证端口序列顺序和时间窗口
+        4. 在最终步骤进行密码验证
+        5. 通过验证后添加临时防火墙规则
+        """
         if not IP in pkt:
             return
 
@@ -142,12 +151,12 @@ class KnockStateMachine:
         current_time = time.time()
         proto, port, payload = None, None, b''
 
-        # 协议解析逻辑优化
+        # 协议解析逻辑（同时处理TCP和UDP协议）
         if TCP in pkt:
             proto = 'TCP'
-            port = pkt[TCP].dport
+            port = pkt[TCP].dport  # 目标端口号
             if Raw in pkt:
-                payload = pkt[Raw].load
+                payload = pkt[Raw].load  # 应用层载荷数据
         elif UDP in pkt:
             proto = 'UDP'
             port = pkt[UDP].dport
@@ -212,6 +221,12 @@ class KnockStateMachine:
                     del self.clients[src_ip]
 
     def _activate_firewall(self, ip):
+        """
+        添加临时防火墙规则
+        使用firewall-cmd创建富规则：
+        firewall-cmd --zone=public --add-rich-rule=
+            'rule family=ipv4 source address=IP port port=PORT protocol=tcp accept'
+        """
         if (ip, self.args.target_port) in self.firewall_rules:
             return
 
@@ -295,4 +310,5 @@ if __name__ == "__main__":
         logger.exception("致命错误:")
         sys.exit(1)
 
-        
+
+
