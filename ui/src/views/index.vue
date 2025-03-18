@@ -2,12 +2,12 @@
   <div class="app-container home">
     <el-row :gutter="20">
       <el-col :sm="24" :lg="24" style="padding-left: 20px">
-        <h2>后台管理框架</h2>
+        <h2>Port Knocking管理系统</h2>
         <p>
-         基于Python的Flask WEB框架实现后台权限管理系统，内容包含：用户管理、角色管理、资源管理和机构管理。前端页面参考了@ruoyi。
+         基于Python的Flask WEB框架实现Port Knocking管理系统，内容包含：用户管理、角色管理、敲门管理、资源管理和机构管理。前端页面参考了@ruoyi。
         </p>
         <p>
-        系统已经切换python 3，我的是在python 3.7.0下测试的，理论上Python 3版本应该都是可以运行的。需要Python 2版本的朋友可以checkout到python2分支。
+        系统使用Python3.9进行开发。
         </p>
       </el-col>
       </el-row>
@@ -48,7 +48,7 @@
     </el-row>
     <el-divider />
     <el-row :gutter="20">
-      <el-col :xs="24" :sm="24" :md="24" :lg="24">
+      <!-- <el-col :xs="24" :sm="24" :md="24" :lg="24">
         <el-card class="update-log">
           <div slot="header" class="clearfix">
             <span>联系信息</span>
@@ -72,7 +72,7 @@
             </p>
           </div>
         </el-card>
-      </el-col>
+      </el-col> -->
       <!-- <el-col :xs="24" :sm="24" :md="12" :lg="8">
         <el-card class="update-log">
           <div slot="header" class="clearfix">

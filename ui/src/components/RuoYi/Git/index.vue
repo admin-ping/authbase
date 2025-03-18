@@ -9,7 +9,7 @@ export default {
   name: 'RuoYiGit',
   data() {
     return {
-      url: 'https://gitee.com/zhujf21st/authbase'
+      url: 'https://github.com/admin-ping/Port_Knocking'
     }
   },
   methods: {
