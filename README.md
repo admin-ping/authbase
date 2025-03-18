@@ -4,13 +4,14 @@
 基于Flask+Vue实现的智能端口敲门认证系统，核心功能包含：
 - 动态端口敲门序列认证（支持TCP/UDP混合协议）
 - 敲门规则生命周期管理（创建/更新/删除）
-- 基于时间窗口的敲门序列验证（支持1-300秒可配置）
+- 基于时间窗口的敲门序列验证（支持开放端口超时时间配置）
 - 安全令牌动态生成（HMAC-SHA256算法）
 - 敲门成功后自动开启目标端口（支持动态ACL更新）
 - 实时操作日志审计（记录完整敲门过程）
 系统采用进程隔离架构，通过独立监听进程保障敲门服务稳定性，并与RBAC权限体系深度集成，提供企业级安全管控能力。
 
 ## 核心功能
+- Port Knocking管理
 - RBAC权限模型
 - 组织机构树形管理
 - 角色权限矩阵配置
@@ -55,11 +56,10 @@ SQLALCHEMY_DATABASE_URI = 'mysql+mysqlconnector://user:password@localhost:3306/a
 # 安装依赖
 pip install -r requirements.txt
 
-# 初始化数据库
-flask --app start init-db
+
 
 # 启动开发服务器
-flask --app start run -h 0.0.0.0 -p 8080
+flask --app start.py run -h 0.0.0.0 -p 8080
 ```
 
 ### 前端启动
