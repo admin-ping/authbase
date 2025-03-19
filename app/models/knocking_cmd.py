@@ -154,16 +154,20 @@ class KnockStateMachine:
         # 协议解析逻辑（同时处理TCP和UDP协议）
         if TCP in pkt:
             proto = 'TCP'
-            port = pkt[TCP].dport  # 目标端口号
-            if Raw in pkt:
-                payload = pkt[Raw].load  # 应用层载荷数据
+            port = pkt[TCP].dport
+            payload = bytes(pkt[TCP].payload)  # 获取TCP层全部负载
+            
         elif UDP in pkt:
             proto = 'UDP'
             port = pkt[UDP].dport
-            if Raw in pkt:
-                payload = pkt[Raw].load
+            payload = bytes(pkt[UDP].payload)  # 获取UDP层全部负载
+
         else:
             return
+
+        # 规范化处理二进制负载
+        payload = payload.replace(b'\x00', b'').strip()  # 清理空字节和空白字符
+
 
         with self.lock:
             # 调试日志：显示收到包的信息
