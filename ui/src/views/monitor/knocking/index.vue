@@ -85,9 +85,32 @@
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
           >删除</el-button>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-download"
+            @click="handleGenerate(scope.row)"
+          >生成</el-button>
         </template>
       </el-table-column>
     </el-table>
+
+    <!-- 生成客户端对话框 -->
+    <el-dialog :title="'生成客户端 - ' + currentRule.portSequence" :visible.sync="generateDialogVisible" width="500px" append-to-body custom-class="generate-dialog">
+      <el-form ref="generateForm" :model="generateForm" label-width="100px" size="small" class="generate-form">
+        <el-form-item label="客户端版本" prop="version">
+          <el-select v-model="generateForm.version" placeholder="请选择客户端版本" style="width: 100%">
+            <el-option label="Python脚本" value="python" />
+            <el-option label="Windows可执行文件" value="exe" />
+            <el-option label="Bash脚本" value="bash" />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="confirmGenerate">确 定</el-button>
+        <el-button @click="generateDialogVisible = false">取 消</el-button>
+      </div>
+    </el-dialog>
 
     <pagination
       v-show="total>0"
@@ -127,6 +150,15 @@
   </div>
 </template>
 
+<style>
+.generate-dialog .generate-form {
+  padding: 20px;
+}
+.generate-dialog .el-form-item {
+  margin-bottom: 20px;
+}
+</style>
+
 <script>
 import { listRules, addRule, delRule, updateRule } from "@/api/monitor/knocking";
 
@@ -158,6 +190,14 @@ export default {
       },
       // 表单参数
       form: {},
+      // 生成对话框显示状态
+      generateDialogVisible: false,
+      // 当前选中的规则
+      currentRule: {},
+      // 生成表单
+      generateForm: {
+        version: undefined
+      },
       // 表单校验
       rules: {
         portSequence: [
@@ -289,6 +329,25 @@ export default {
         this.getList();
         this.$modal.msgSuccess("删除成功");
       }).catch(() => {});
+    },
+    /** 生成客户端按钮操作 */
+    handleGenerate(row) {
+      this.currentRule = row;
+      this.generateForm.version = undefined;
+      this.generateDialogVisible = true;
+    },
+    /** 确认生成客户端 */
+    confirmGenerate() {
+      if (!this.generateForm.version) {
+        this.$message.warning("请选择客户端版本");
+        return;
+      }
+      // 根据选择的版本下载对应的客户端脚本
+      let scriptType = this.generateForm.version;
+      // 构建下载链接并触发下载
+      const downloadUrl = process.env.VUE_APP_BASE_API + '/script/' + this.currentRule.id + '/' + scriptType;
+      window.location.href = downloadUrl;
+      this.generateDialogVisible = false;
     }
   }
 };

@@ -34,3 +34,13 @@ export function updateRule(ruleId, data) {
     data: data
   })
 }
+
+// 生成客户端脚本
+export function generateScript(ruleId, scriptType, host) {
+  const params = host ? { host } : {}
+  return request({
+    url: `/script/${ruleId}/${scriptType}`,
+    method: 'get',
+    params: params
+  })
+}

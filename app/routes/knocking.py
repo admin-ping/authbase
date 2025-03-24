@@ -492,23 +492,50 @@ def update_knocking_rule(rule_id):
 @login_required
 @permission('monitor:knocking:script')
 def generate_client_script(rule_id, script_type):
-    """生成客户端脚本
+    """生成端口敲门认证的客户端脚本
     
-    根据指定的规则ID和脚本类型生成相应的客户端脚本。
-    支持生成Python、EXE和Bash三种类型的脚本。
+    根据指定的规则ID和脚本类型生成相应的客户端脚本。支持生成多种类型的客户端脚本，
+    以方便不同环境下的使用。生成的脚本会包含完整的敲门序列和认证逻辑。
+    
+    功能特点：
+    - 支持Python、EXE和Bash三种脚本格式
+    - 自动获取服务器IP地址
+    - 支持自定义目标主机地址
+    - 生成的脚本包含完整的敲门认证逻辑
     
     Args:
-        rule_id: 敲门规则ID
-        script_type: 脚本类型 (python/exe/bash)
-        
+        rule_id (str): 敲门规则ID，用于获取对应的端口序列配置
+        script_type (str): 脚本类型，可选值：
+            - python: 生成Python脚本，适合Python环境
+            - exe: 生成Windows可执行文件，适合Windows环境
+            - bash: 生成Shell脚本，适合Linux/Unix环境
+    
+    Query Parameters:
+        host (str, optional): 目标服务器地址，如果不指定则自动获取服务器内网IP
+    
     Returns:
-        文件下载响应
+        flask.Response: 文件下载响应，包含生成的客户端脚本
         
+    Response Headers:
+        Content-Type: application/octet-stream
+        Content-Disposition: attachment; filename=<script_name>
+    
     Status Codes:
-        200: 脚本生成成功
+        200: 脚本生成成功并开始下载
         400: 无效的脚本类型
-        404: 规则不存在
+        404: 指定的规则不存在
         500: 服务器内部错误
+    
+    Examples:
+        >>> # 生成Python客户端脚本
+        >>> GET /script/a1b2c3d4/python
+        >>> # 生成指定目标主机的EXE客户端
+        >>> GET /script/a1b2c3d4/exe?host=192.168.1.100
+    
+    Note:
+        - 生成的脚本会自动包含认证所需的所有配置
+        - 脚本的运行可能需要相应的环境和权限
+        - 建议在安全的内网环境中使用
     """
     try:
         # 验证脚本类型
