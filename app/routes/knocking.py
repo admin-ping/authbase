@@ -527,7 +527,23 @@ def generate_client_script(rule_id, script_type):
             }), 404
 
         # 获取服务器IP地址
-        host = request.args.get('host', request.remote_addr)
+        def get_internal_ip():
+            import socket
+            try:
+                # 创建一个UDP socket
+                s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                # 连接一个外部地址（不需要真实连接）
+                s.connect(("8.8.8.8", 80))
+                # 获取本地socket的IP地址
+                ip = s.getsockname()[0]
+                s.close()
+                return ip
+            except Exception:
+                return "127.0.0.1"
+
+        # 优先使用请求参数中的host，如果没有则使用服务器内网IP
+        host = request.args.get('host', get_internal_ip())
+
 
         # 初始化脚本生成器
         generator = ScriptGenerator()
