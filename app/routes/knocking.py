@@ -16,7 +16,7 @@
 # 导入所需的模块和依赖
 from .. import db
 from ..base import base
-from flask import request, jsonify
+from flask import request, jsonify, send_file
 from flask_login import login_required, current_user
 from werkzeug.security import generate_password_hash
 import subprocess
@@ -26,6 +26,7 @@ import logging
 import hashlib
 import signal
 from ..models.KnockingRule import KnockingRule
+from ..models.ScriptGenerator import ScriptGenerator
 from .. import permission
 
 # 进程信息存储路径
@@ -481,6 +482,80 @@ def update_knocking_rule(rule_id):
         # 回滚数据库事务
         db.session.rollback()
         logging.error(f"修改规则失败: {str(e)}")
+        return jsonify({
+            'code': 500,
+            'msg': str(e)
+        }), 500
+
+
+@base.route('/script/<rule_id>/<script_type>', methods=['GET'])
+@login_required
+@permission('monitor:knocking:script')
+def generate_client_script(rule_id, script_type):
+    """生成客户端脚本
+    
+    根据指定的规则ID和脚本类型生成相应的客户端脚本。
+    支持生成Python、EXE和Bash三种类型的脚本。
+    
+    Args:
+        rule_id: 敲门规则ID
+        script_type: 脚本类型 (python/exe/bash)
+        
+    Returns:
+        文件下载响应
+        
+    Status Codes:
+        200: 脚本生成成功
+        400: 无效的脚本类型
+        404: 规则不存在
+        500: 服务器内部错误
+    """
+    try:
+        # 验证脚本类型
+        if script_type not in ['python', 'exe', 'bash']:
+            return jsonify({
+                'code': 400,
+                'msg': '无效的脚本类型'
+            }), 400
+
+        # 查找规则
+        rule = KnockingRule.query.get(rule_id)
+        if not rule:
+            return jsonify({
+                'code': 404,
+                'msg': '规则不存在'
+            }), 404
+
+        # 获取服务器IP地址
+        host = request.args.get('host', request.remote_addr)
+
+        # 初始化脚本生成器
+        generator = ScriptGenerator()
+
+        # 根据类型生成脚本
+        if script_type == 'python':
+            script_path = generator.generate_python_script(host, rule.port_sequence)
+            filename = 'knockclient.py'
+        elif script_type == 'exe':
+            script_path = generator.generate_exe_package(host, rule.port_sequence)
+            filename = 'knockclient_exe.zip'
+        else:  # bash
+            script_path = generator.generate_bash_script(host, rule.port_sequence)
+            filename = 'knockclient.sh'
+
+        # 记录操作日志
+        logging.info(f"用户 {current_user.LOGINNAME} 下载了规则 {rule_id} 的 {script_type} 客户端脚本")
+
+        # 返回文件
+        return send_file(
+            script_path,
+            as_attachment=True,
+            download_name=filename,
+            mimetype='application/octet-stream'
+        )
+
+    except Exception as e:
+        logging.error(f"生成客户端脚本失败: {str(e)}")
         return jsonify({
             'code': 500,
             'msg': str(e)
