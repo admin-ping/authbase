@@ -50,6 +50,11 @@ CREATE DATABASE authbase CHARACTER SET utf8mb4;
 ```python
 SQLALCHEMY_DATABASE_URI = 'mysql+mysqlconnector://user:password@localhost:3306/authbase'
 ```
+1. 初始化数据库
+```bash
+mysql -u root -p < db.sql
+```
+
 
 ### 后端启动
 ```bash
@@ -59,7 +64,7 @@ pip install -r requirements.txt
 
 
 # 启动开发服务器
-flask --app start.py run -h 0.0.0.0 -p 8080
+flask --app start.py run
 ```
 
 ### 前端启动
@@ -90,11 +95,11 @@ cd ui && npm run build
 
 # 使用Gunicorn部署
 pip install gunicorn
-gunicorn -w 4 -b 0.0.0.0:8080 "start:create_app()"
+gunicorn -w 4  "start:create_app()"
 ```
 
 ## 注意事项
 - 开发时自动忽略.pyc文件（已配置.gitignore）
 - 生产环境请关闭DEBUG模式
 - 数据库迁移请使用Flask-Migrate
-
+- 在Windows环境下可测试除端口敲门外的全部功能
