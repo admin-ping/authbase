@@ -92,7 +92,7 @@ def add_knocking_rule():
         
     Returns:
         JSON响应：
-        - 成功：{"status": "success", "pid": 进程ID, "command": 执行的命令}
+        - 成功：{"status": "success", "pid": 进程ID}
         - 失败：{"error": 错误信息}
         
     Status Codes:
@@ -121,8 +121,16 @@ def add_knocking_rule():
         # hashed_pwd = generate_password_hash(data['password'])
 
         # 生成规则ID（基于端口序列和目标端口）
-        rule_str = f"{mapped_data['port_sequence'].replace(':', '_').replace(',', '-')}_{mapped_data['target_port']}"
+        rule_str = f"{mapped_data['port_sequence'].replace(':', '_').replace(',', '-')}"
         rule_id = hashlib.md5(rule_str.encode('utf-8')).hexdigest()
+
+        # 检查是否存在相同的规则ID
+        existing_rule = KnockingRule.query.get(rule_id)
+        if existing_rule:
+            return jsonify({
+                'code': 400,
+                'msg': '端口序列重复'
+            }), 400
 
         # 创建数据库记录
         rule = KnockingRule(
@@ -190,8 +198,7 @@ def add_knocking_rule():
             'code': 200,
             'msg': '规则添加成功',
             'data': {
-                'pid': process.pid,
-                'command': ' '.join(cmd)
+                'pid': process.pid
             }
         }), 201
 
