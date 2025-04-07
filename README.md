@@ -50,7 +50,7 @@ CREATE DATABASE authbase CHARACTER SET utf8mb4;
 ```python
 SQLALCHEMY_DATABASE_URI = 'mysql+mysqlconnector://user:password@localhost:3306/authbase'
 ```
-1. 初始化数据库
+3. 初始化数据库
 ```bash
 mysql -u root -p < db.sql
 ```
