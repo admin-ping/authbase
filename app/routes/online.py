@@ -43,17 +43,27 @@ def grid_online():
 
     # 构建排序条件
     order_by = []
-    if request.form.get('sort'):
-        if request.form.get('order') == 'asc':
-            order_by.append(asc(getattr(OnLine,request.form.get('sort').upper())))
-        elif request.form.get('order') == 'desc':
-            order_by.append(desc(getattr(OnLine,request.form.get('sort').upper())))
-        else:
-            order_by.append(getattr(OnLine,request.form.get('sort').upper()))
+    if request.args.get('orderByColumn'):
+        # 前端字段名到数据库字段名的映射
+        field_mapping = {
+            'loginTime': 'CREATEDATETIME',
+            'userName': 'LOGINNAME',
+            'ipaddr': 'IP',
+            'type': 'TYPE'
+        }
+        # 获取排序字段名并转换为数据库字段名
+        field_name = field_mapping.get(request.args.get('orderByColumn'))
+        if field_name:
+            if request.args.get('isAsc') == 'ascending':
+                order_by.append(asc(getattr(OnLine, field_name)))
+            else:
+                order_by.append(desc(getattr(OnLine, field_name)))
+    else:
+        order_by.append(desc(OnLine.CREATEDATETIME))
 
     # 分页查询
-    page = request.form.get('page', 1, type=int)
-    rows = request.form.get('rows', 10, type=int)
+    page = request.args.get('pageNum', 1, type=int)
+    rows = request.args.get('pageSize', 10, type=int)
     pagination = OnLine.query.filter(*filters).order_by(*order_by).paginate(
         page=page, per_page=rows, error_out=False)
     onlines = pagination.items

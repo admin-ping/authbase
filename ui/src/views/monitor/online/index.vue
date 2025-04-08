@@ -25,22 +25,21 @@
     </el-form>
     <el-table
       v-loading="loading"
-      :data="list.slice((pageNum-1)*pageSize,pageNum*pageSize)"
+      :data="list"
       style="width: 100%;"
+      @sort-change="handleSortChange"
     >
-      <el-table-column label="序号" type="index" align="center">
+      <el-table-column label="序号" type="index" align="center" width="50">
         <template slot-scope="scope">
           <span>{{(pageNum - 1) * pageSize + scope.$index + 1}}</span>
         </template>
       </el-table-column>
-      <el-table-column label="会话编号" align="center" prop="tokenId" :show-overflow-tooltip="true" />
-      <el-table-column label="登录名称" align="center" prop="userName" :show-overflow-tooltip="true" />
-      <el-table-column label="部门名称" align="center" prop="deptName" />
-      <el-table-column label="主机" align="center" prop="ipaddr" :show-overflow-tooltip="true" />
+      <el-table-column label="会话编号" align="center" prop="tokenId" sortable="custom" :show-overflow-tooltip="true" />
+      <el-table-column label="登录名称" align="center" prop="userName" sortable="custom" :show-overflow-tooltip="true" />
+      <el-table-column label="部门名称" align="center" prop="deptName" sortable="custom" />
+      <el-table-column label="主机" align="center" prop="ipaddr" sortable="custom" :show-overflow-tooltip="true" />
       <el-table-column label="登录地点" align="center" prop="loginLocation" :show-overflow-tooltip="true" />
-      <!-- <el-table-column label="浏览器" align="center" prop="browser" />
-      <el-table-column label="操作系统" align="center" prop="os" /> -->
-      <el-table-column label="登录时间" align="center" prop="loginTime" width="180">
+      <el-table-column label="登录时间" align="center" prop="loginTime" sortable="custom" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.loginTime) }}</span>
         </template>
@@ -80,7 +79,11 @@ export default {
       // 查询参数
       queryParams: {
         ipaddr: undefined,
-        userName: undefined
+        userName: undefined,
+        pageNum: 1,
+        pageSize: 10,
+        orderByColumn: undefined,
+        isAsc: undefined
       }
     };
   },
@@ -96,6 +99,12 @@ export default {
         this.total = response.total;
         this.loading = false;
       });
+    },
+    /** 排序触发事件 */
+    handleSortChange(column) {
+      this.queryParams.orderByColumn = column.prop;
+      this.queryParams.isAsc = column.order === "ascending";
+      this.getList();
     },
     /** 搜索按钮操作 */
     handleQuery() {
