@@ -344,17 +344,17 @@ export default {
       }
       // 根据选择的版本下载对应的客户端脚本
       let scriptName = this.generateForm.version;
-      // switch(this.generateForm.version) {
-      //   case 'python':
-      //     scriptName = 'client.py';
-      //     break;
-      //   case 'exe':
-      //     scriptName = 'PortKnockPro.exe';
-      //     break;
-      //   case 'bash':
-      //     scriptName = 'client.sh';
-      //     break;
-      // }
+      /**  switch(this.generateForm.version) {
+        case 'python':
+          scriptName = 'client.py';
+          break;
+        case 'exe':
+          scriptName = 'PortKnockPro.exe';
+          break;
+        case 'bash':
+          scriptName = 'client.sh';
+          break;
+       } */
       // 构建下载链接并触发下载
       const downloadUrl = process.env.VUE_APP_BASE_API + '/script/' + this.currentRule.id + '/' + scriptName;
       window.location.href = downloadUrl;
