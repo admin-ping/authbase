@@ -100,6 +100,9 @@ def do_login():
         md.update(request.json['password'].encode('utf-8'))
         #MD5加密后的内容同数据库密码比较
         if md.hexdigest() == user.PWD:
+            # 检查用户状态是否正常
+            if user.STATUS == '1':
+                return jsonify({'msg': '该用户已被禁用', 'code': 500})
             login_user(user)
             record_login_history(1)
             return jsonify({'msg': '登录成功~', 'code': 200, 'url': '/', 'token': str(uuid.uuid4())})
