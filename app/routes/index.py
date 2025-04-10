@@ -46,7 +46,7 @@ def getRouters():
     #    text("FIND_IN_SET(ID, :ids) > 0")).params(ids = ','.join(ids)) .all()
     
     allResources = Resource.query.join(ResourceType, Resource.type).filter(
-        Resource.SYRESOURCE_ID == None).all()
+        Resource.SYRESOURCE_ID == None).order_by(Resource.SEQ.asc()).all()
     # filter resource not allowed
     for res in allResources:
        setAccessable(res, ids)

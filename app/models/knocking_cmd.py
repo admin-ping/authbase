@@ -66,7 +66,7 @@ def setup_logging():
         backupCount=30,  # 保留30天的日志
         encoding='utf-8'
     )
-
+    
     # 自定义文件名格式
     def custom_namer(default_name):
         """自定义日志文件名格式
