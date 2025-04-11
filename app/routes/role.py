@@ -86,6 +86,8 @@ def grid():
     filters = []
     if request.args.get('roleName'):
         filters.append(Role.NAME.like('%' + request.args.get('roleName') + '%'))
+    if request.args.get('status'):
+        filters.append(Role.STATUS == request.args.get('status'))
 
     order_by = []
     if request.form.get('sort'):
