@@ -136,6 +136,8 @@ def user_grid():
         filters.append(User.LOGINNAME.like('%' + request.args['userName'] + '%'))
     if 'phonenumber' in request.args:
         filters.append(User.PHONENUMBER.like('%' + request.args['phonenumber'] + '%'))
+    if 'status' in request.args:
+        filters.append(User.STATUS == request.args['status'])
     if 'params[beginTime]' in request.args and 'params[endTime]' in request.args:
         filters.append(User.CREATEDATETIME >  request.args['params[beginTime]'])
         filters.append(User.CREATEDATETIME <  request.args['params[endTime]'])

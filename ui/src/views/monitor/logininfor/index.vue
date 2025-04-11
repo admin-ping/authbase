@@ -21,13 +21,13 @@
       </el-form-item>
       <el-form-item label="状态" prop="status">
         <el-select
-          v-model="queryParams.status"
+          v-model="queryParams.type"
           placeholder="登录状态"
           clearable
           style="width: 240px"
         >
           <el-option
-            v-for="dict in dict.type.sys_common_status"
+            v-for="dict in dict.type.sys_login_type"
             :key="dict.value"
             :label="dict.label"
             :value="dict.value"
@@ -152,7 +152,7 @@ export default {
         pageSize: 10,
         ipaddr: undefined,
         userName: undefined,
-        status: undefined
+        type: undefined
       }
     };
   },

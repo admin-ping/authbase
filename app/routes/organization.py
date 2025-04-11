@@ -19,10 +19,12 @@ def syorganization_treeGrid():
     """获取部门列表
     
     支持按部门名称过滤
+    支持按部门状态过滤
     返回所有匹配的部门信息
     
     Query Parameters:
         deptName: 部门名称，可选，支持模糊查询
+        status: 部门状态，可选，精确匹配
         
     Returns:
         返回部门列表，格式为JSON {msg: 提示信息, code: 状态码, data: [...部门列表]}
@@ -30,6 +32,8 @@ def syorganization_treeGrid():
     filters = []
     if 'deptName' in request.args:
         filters.append(Organization.NAME.like('%' + request.args['deptName'] + '%'))
+    if 'status' in request.args:
+        filters.append(Organization.STATUS == request.args['status'])
 
     orgs = Organization.query.filter(*filters)
 
