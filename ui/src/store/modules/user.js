@@ -37,6 +37,10 @@ const user = {
       const uuid = userInfo.uuid
       return new Promise((resolve, reject) => {
         login(username, password, code, uuid).then(res => {
+          // 登录成功后清除sessionObj
+          import('@/plugins/cache').then(cache => {
+            cache.default.session.remove('sessionObj')
+          })
           setToken(res.token)
           commit('SET_TOKEN', res.token)
           resolve()
