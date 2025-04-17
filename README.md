@@ -41,6 +41,23 @@
 - Node.js 14+
 - MySQL 8.0+
 
+
+### mysql安装
+```bash
+# 安装mysql
+wget https://repo.mysql.com//mysql84-community-release-el9-1.noarch.rpm
+# 导入rpm
+rpm -ivh mysql84-community-release-el9-1.noarch.rpm
+# 安装mysql-server
+dnf install mysql-server
+# 启动mysql服务
+systemctl enable --now mysqld
+# 查看密码
+grep "password" /var/log/mysqld.log
+
+
+```
+
 ### 数据库配置
 1. 创建数据库
 ```sql
@@ -72,6 +89,14 @@ flask --app start.py run
 cd ui
 npm install
 npm run dev
+```
+
+### 允许外部访问web
+```bash
+# 开放8080端口
+firewall-cmd --zone=public --add-port=8080/tcp --permanent
+# 重启防火墙
+firewall-cmd --reload
 ```
 
 ## 系统架构
