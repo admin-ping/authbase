@@ -17,6 +17,7 @@ class Config:
     - FLASKY_MAIL_SENDER: 邮件发送地址（默认：'example@example.com'）
     - FLASKY_ADMIN: 管理员邮箱（从环境变量获取）
     - SQLALCHEMY_TRACK_MODIFICATIONS: 跟踪对象修改（默认：True）
+    - SQLALCHEMY_ENGINE_OPTIONS: 数据库引擎选项，包含连接预检机制
     """
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'hard to guess string'
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
@@ -24,6 +25,9 @@ class Config:
     FLASKY_MAIL_SENDER = 'example@example.com'
     FLASKY_ADMIN = os.environ.get('FLASKY_ADMIN')
     SQLALCHEMY_TRACK_MODIFICATIONS = True
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'pool_pre_ping': True
+    }
 
     @staticmethod
     def init_app(app):
