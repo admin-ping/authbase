@@ -35,7 +35,7 @@ export default {
   },
   data() {
     return {
-      title: '权限管理系统',
+      title: 'Port Knocking管理系统',
       logo: logoImg
     }
   }

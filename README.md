@@ -110,7 +110,7 @@ pip install -r requirements.txt
 
 
 # 启动开发服务器
-flask --app start.py run
+python -m flask --app start.py run
 ```
 
 ### 前端启动
