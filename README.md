@@ -54,9 +54,38 @@ dnf install mysql-server
 systemctl enable --now mysqld
 # 查看密码
 grep "password" /var/log/mysqld.log
+# 登录mysql
+mysql -u root -p
+
+```
+
+### mysql配置
+```mysql
+
+# 修改密码
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'NewPassword';
+
+# 修改远程访问权限
+use mysql;
+update user set host="%" where user="root";
+flush privileges;
 
 
 ```
+
+### mysql配置（可选项）
+```mysql
+# 修改密码复杂度验证
+set global validate_password.length=4;
+# 修改密码复杂度验证策略
+set global validate_password.policy=0;
+# 修改密码复杂度验证策略
+set global validate_password.special_char_count=0;
+
+alter user "root"@"%" identified by "123456";
+
+```
+
 
 ### 数据库配置
 1. 创建数据库
