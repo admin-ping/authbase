@@ -24,7 +24,7 @@ class ScriptGenerator:
     def __init__(self):
         self.SCRIPT_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'script')
         self.PYTHON_TEMPLATE = os.path.join(self.SCRIPT_DIR, 'client.py')
-        self.EXE_TEMPLATE = os.path.join(self.SCRIPT_DIR, 'PortKnockPro.exe')
+        self.EXE_TEMPLATE = os.path.join(self.SCRIPT_DIR, 'PortKnockProConfig.exe')
         self.BASH_TEMPLATE = os.path.join(self.SCRIPT_DIR, 'client.sh')
         self.START_TEMPLATE = os.path.join(self.SCRIPT_DIR, 'start.txt')
     
