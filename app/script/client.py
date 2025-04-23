@@ -3,6 +3,7 @@
 from scapy.all import *
 import time
 import hashlib
+from getpass import getpass
 
 # 配置区域
 SERVER_IP = '192.168.1.173'
@@ -16,7 +17,7 @@ KNOCK_SEQUENCE = [
 
 def send_knock():
     # 密码处理
-    password = hashlib.md5(str(input("请输入连接密码：\n")).strip().encode()).hexdigest().encode()  # 转换为bytes
+    password = hashlib.md5(str(getpass("请输入认证密码(明文)：")).strip().encode()).hexdigest().encode()  # 转换为bytes
 
     for i, (port, proto) in enumerate(KNOCK_SEQUENCE):
         try:
