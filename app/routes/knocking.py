@@ -28,6 +28,7 @@ import signal
 from ..models.KnockingRule import KnockingRule
 from ..models.ScriptGenerator import ScriptGenerator
 from .. import permission
+from psutil import Process, NoSuchProcess
 
 # 进程信息存储路径
 PID_FILE_DIR = '/var/run/authbase_knocking/'  # 存储规则进程PID的目录
@@ -150,7 +151,7 @@ def add_knocking_rule():
 
         # 构造命令
         cmd = [
-            'sudo',  # 需要root权限
+            # 'sudo',  # 需要root权限
             'python3',
             os.path.join(os.path.dirname(os.path.dirname(__file__)), 'models', 'knocking_cmd.py'),
             '-pl', mapped_data['port_sequence'],
@@ -223,50 +224,129 @@ def stop_knocking_service(pid_file=None):
         - 对于所有进程的停止操作都会记录到日志中
         - 进程终止使用SIGTERM信号，给予进程清理资源的机会
     """
-    if pid_file and os.path.exists(pid_file):
-        # 停止特定规则的进程
-        with open(pid_file, 'r') as f:
-            pid = int(f.read().strip())
-
+    def kill_process(pid):
+        """实际执行进程终止的内部函数"""
         try:
-            if os.name != 'nt':
-                # Linux系统下使用kill命令发送SIGTERM信号
-                os.kill(pid, signal.SIGTERM)
-                logging.info(f"已发送SIGTERM信号到进程 {pid}")
-            else:
-                process = psutil.Process(pid)
-                process.terminate()
-            logging.info(f"已停止进程 {pid}")
-        except (psutil.NoSuchProcess, ProcessLookupError):
-            logging.warning(f"进程 {pid} 不存在")
-            pass
-
-        os.remove(pid_file)
-    elif pid_file is None and os.path.exists(PID_FILE_DIR):
-        # 停止所有规则进程
-        for filename in os.listdir(PID_FILE_DIR):
-            if filename.endswith('.pid'):
-                pid_path = os.path.join(PID_FILE_DIR, filename)
+            # 1. 首先尝试优雅终止(SIGTERM)
+            os.kill(pid, signal.SIGTERM)
+            logging.info(f"向进程 {pid} 发送SIGTERM信号请求优雅退出")
+            
+            # 等待最多5秒让进程自行退出
+            for _ in range(10):
                 try:
-                    with open(pid_path, 'r') as f:
-                        pid = int(f.read().strip())
-                    
+                    os.kill(pid, 0)  # 检查进程是否存在
+                except ProcessLookupError:
+                    logging.info(f"进程 {pid} 已正常退出")
+                    return True
+            
+            # 2. 如果5秒后仍未退出，强制终止(SIGKILL)
+            logging.warning(f"进程 {pid} 未响应SIGTERM，将发送SIGKILL强制终止")
+            os.kill(pid, 9)  # 使用数字9代替SIGKILL,在Windows和Linux上都有效
+            
+            # 再次检查是否终止
+            try:
+                os.kill(pid, 0)
+                logging.error(f"无法终止进程 {pid}")
+                return False
+            except ProcessLookupError:
+                logging.info(f"进程 {pid} 已被强制终止")
+                return True
+                
+        except ProcessLookupError:
+            logging.info(f"进程 {pid} 已不存在")
+            return True
+        except PermissionError:
+            logging.error(f"权限不足，无法终止进程 {pid}")
+            return False
+        except Exception as e:
+            logging.error(f"终止进程 {pid} 时发生意外错误: {str(e)}")
+            return False
+
+    try:
+        # 情况1: 停止指定PID文件对应的进程
+        if pid_file and os.path.exists(pid_file):
+            with open(pid_file, 'r') as f:
+                pid = int(f.read().strip())
+            
+            logging.info(f"准备停止进程 {pid} (来自PID文件: {pid_file})")
+            
+            # 检查进程是否确实存在且是我们的敲门服务
+            try:
+                proc = Process(pid)
+                cmdline = ' '.join(proc.cmdline())
+                if 'knocking_cmd.py' not in cmdline:
+                    logging.warning(f"PID {pid} 不是敲门服务进程，实际命令: {cmdline}")
+                    os.remove(pid_file)
+                    return False
+            except NoSuchProcess:
+                logging.info(f"进程 {pid} 已不存在，清理PID文件")
+                os.remove(pid_file)
+                return True
+            
+            # 实际终止进程
+            result = kill_process(pid)
+            
+            # 无论成功与否都尝试清理PID文件
+            try:
+                os.remove(pid_file)
+            except:
+                pass
+                
+            return result
+        
+        # 情况2: 停止所有敲门服务进程
+        elif pid_file is None and os.path.exists(PID_FILE_DIR):
+            logging.info("准备停止所有敲门服务进程")
+            success = True
+            for filename in os.listdir(PID_FILE_DIR):
+                if filename.endswith('.pid'):
+                    pid_path = os.path.join(PID_FILE_DIR, filename)
                     try:
-                        if os.name != 'nt':
-                            # Linux系统下使用kill命令发送SIGTERM信号
-                            os.kill(pid, signal.SIGTERM)
-                            logging.info(f"已发送SIGTERM信号到进程 {pid}")
-                        else:
-                            process = psutil.Process(pid)
-                            process.terminate()
-                        logging.info(f"已停止进程 {pid}")
-                    except (psutil.NoSuchProcess, ProcessLookupError):
-                        pass
-                    
-                    os.remove(pid_path)
-                except Exception as e:
-                    logging.error(f"停止进程时出错: {str(e)}")
-                    continue
+                        with open(pid_path, 'r') as f:
+                            pid = int(f.read().strip())
+                        
+                        logging.info(f"准备停止进程 {pid} (来自PID文件: {filename})")
+                        
+                        # 检查进程是否属于我们的服务
+                        try:
+                            proc = Process(pid)
+                            cmdline = ' '.join(proc.cmdline())
+                            if 'knocking_cmd.py' not in cmdline:
+                                logging.warning(f"跳过非敲门服务进程 {pid}")
+                                continue
+                        except NoSuchProcess:
+                            logging.info(f"进程 {pid} 已不存在，清理PID文件")
+                            try:
+                                os.remove(pid_path)
+                            except:
+                                pass
+                            continue
+                        
+                        # 终止进程
+                        if not kill_process(pid):
+                            success = False
+                        
+                        # 清理PID文件
+                        try:
+                            os.remove(pid_path)
+                        except:
+                            pass
+                            
+                    except Exception as e:
+                        logging.error(f"处理PID文件 {filename} 时出错: {str(e)}")
+                        success = False
+                        continue
+            
+            return success
+        
+        # 情况3: 无效参数
+        else:
+            logging.warning("无效的PID文件路径或PID目录不存在")
+            return False
+            
+    except Exception as e:
+        logging.error(f"停止服务时发生未预期错误: {str(e)}")
+        return False
 
 @base.route('/rules/<rule_id>', methods=['DELETE'])
 @login_required
@@ -449,7 +529,7 @@ def update_knocking_rule(rule_id):
 
         # 构造新的命令
         cmd = [
-            'sudo',
+            # 'sudo',
             'python3',
             os.path.join(os.path.dirname(os.path.dirname(__file__)), 'models', 'knocking_cmd.py'),
             '-pl', mapped_data['port_sequence'],

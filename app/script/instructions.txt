@@ -31,7 +31,7 @@
 
 ### 命令行参数
 ```
-PortKnockPro.exe -H <目标IP> -p <端口序列>
+PortKnockPro.exe -H <目标IP> -p "<端口序列>"
 
 参数说明：
 -H, --host      目标服务器IP地址
